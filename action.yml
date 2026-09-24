@@ -128,12 +128,12 @@ runs:
         # 2026-09-24: Git-bash on Windows rewrites values that look like POSIX paths
         # before a native program sees them (`(^|/)x` became `(^|C:/Program Files/Git/)x`).
         MSYS_NO_PATHCONV: "1"
-        COMMENT_TTL_VERSION: "0.0.0-dev"
-        SHA256_LINUX_X64: "PLACEHOLDER"
-        SHA256_LINUX_ARM64: "PLACEHOLDER"
-        SHA256_MACOS_ARM64: "PLACEHOLDER"
-        SHA256_MACOS_X64: "PLACEHOLDER"
-        SHA256_WINDOWS_X64: "PLACEHOLDER"
+        COMMENT_TTL_VERSION: "1.0.0"
+        SHA256_LINUX_X64: "abe6cc64bdd92bbf0a75e11be8a965ae6cd7e3f91d2dbd0b70febcabe8795319"
+        SHA256_LINUX_ARM64: "34607c39f5a3cac8a63ead3633ed3cc8b41e9562e1ef0118489306e3fc085e5c"
+        SHA256_MACOS_ARM64: "02099658c99b36ab60a8a81e62133ebd0fb5cbdef881cc326639fbe0ca323b1e"
+        SHA256_MACOS_X64: "cbe047c971c62c82a3d432c906b1d5675d8749d67538b117b1f2d073ab672b8a"
+        SHA256_WINDOWS_X64: "9ab535b4c60a2d79d25d7efb6ee4b473272f584b0caa8f0e022db9a8f90c17fb"
       run: |
         set -euo pipefail
         if [ -n "$INPUT_BINARY_PATH" ]; then

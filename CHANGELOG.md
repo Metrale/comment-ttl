@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 — 2026-09-24
+
+- The action's checksum step failed on Windows runners: GNU `sha256sum`
+  prefixes the digest with a backslash when the path contains one. The
+  digest is now computed on the bare file name. v1.0.0 is unaffected on
+  Linux and macOS; its binaries are identical.
+
 ## 1.0.0 — 2026-09-24
 
 First release.

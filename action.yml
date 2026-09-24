@@ -161,11 +161,14 @@ runs:
         url="https://github.com/Metrale/comment-ttl/releases/download/v${COMMENT_TTL_VERSION}/$asset"
         echo "Downloading $url"
         curl --fail --silent --show-error --location --retry 3 --output "$bin" "$url"
+        # 2026-09-24: hash the bare file name from inside its directory: GNU sha256sum
+        # prefixes the digest with `\` when the path contains a backslash (Windows).
         if command -v sha256sum >/dev/null 2>&1; then
-          actual=$(sha256sum "$bin" | cut -d ' ' -f 1)
+          actual=$(cd "$dest" && sha256sum "$asset" | cut -d ' ' -f 1)
         else
-          actual=$(shasum -a 256 "$bin" | cut -d ' ' -f 1)
+          actual=$(cd "$dest" && shasum -a 256 "$asset" | cut -d ' ' -f 1)
         fi
+        actual="${actual#\\}"
         if [ "$actual" != "$sum" ]; then
           echo "::error title=comment-ttl::checksum mismatch for $asset: expected $sum, got $actual"
           exit 2

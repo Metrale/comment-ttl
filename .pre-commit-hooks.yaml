@@ -1,0 +1,8 @@
+# 2026-09-24: pre-commit integration; builds the CLI from this repository.
+- id: comment-ttl
+  name: comment-ttl
+  description: Fail when a comment has not been re-verified within its TTL
+  entry: comment-ttl check
+  language: rust
+  pass_filenames: false
+  always_run: true

@@ -1,0 +1,68 @@
+---
+source: tests/lexer_golden.rs
+expression: comments
+---
+- line: 1
+  end_line: 1
+  kind: line
+  marker: //!
+  own_line: true
+  indent: ""
+  raw: "//! 2026-09-24: inner doc comment at the top"
+  text: "2026-09-24: inner doc comment at the top"
+- line: 4
+  end_line: 5
+  kind: line
+  marker: ///
+  own_line: true
+  indent: ""
+  raw: "/// Doc comment with prose is not exempt\n/// and spans two lines"
+  text: "Doc comment with prose is not exempt\nand spans two lines"
+- line: 7
+  end_line: 7
+  kind: line
+  marker: //
+  own_line: false
+  indent: ""
+  raw: // raw string then a real comment
+  text: raw string then a real comment
+- line: 8
+  end_line: 8
+  kind: line
+  marker: //
+  own_line: false
+  indent: ""
+  raw: // byte string
+  text: byte string
+- line: 9
+  end_line: 9
+  kind: line
+  marker: //
+  own_line: false
+  indent: ""
+  raw: // char literals
+  text: char literals
+- line: 10
+  end_line: 10
+  kind: block
+  marker: /*
+  own_line: true
+  indent: "    "
+  raw: /* outer /* nested */ still outer */
+  text: outer /* nested */ still outer
+- line: 11
+  end_line: 11
+  kind: line
+  marker: //
+  own_line: false
+  indent: ""
+  raw: // trailing
+  text: trailing
+- line: 13
+  end_line: 13
+  kind: line
+  marker: //
+  own_line: true
+  indent: "    "
+  raw: "// no-rot: mirrors RFC 8949 which does not change"
+  text: "no-rot: mirrors RFC 8949 which does not change"

@@ -1,0 +1,133 @@
+---
+source: tests/cli.rs
+expression: "String::from_utf8_lossy(&a.get_output().stdout)"
+---
+{
+  "tool": "comment-ttl",
+  "version": "[version]",
+  "generated_at": "[timestamp]",
+  "reference_date": "2026-09-24",
+  "reference_source": "fixed",
+  "comment_ttl": "1 month",
+  "comment_ttl_iso": "P1M",
+  "warn_within": "7d",
+  "scope": "all",
+  "counts": {
+    "files_scanned": 3,
+    "files_skipped_binary": 1,
+    "comments": 17,
+    "flagged": 8,
+    "stale": 2,
+    "undated": 3,
+    "malformed": 2,
+    "future": 1,
+    "exempt": 4,
+    "escape": 1,
+    "expiring": 1,
+    "fresh": 3
+  },
+  "findings": [
+    {
+      "path": "scripts/build.sh",
+      "line": 2,
+      "end_line": 2,
+      "classification": "undated",
+      "reason": "no date at the start of the comment",
+      "text": "undated shell comment",
+      "fingerprint": "3d94d75f5cb0493c8ee92d1326f124336cd3cfd96337466955ee205f6758c90b"
+    },
+    {
+      "path": "src/lib.rs",
+      "line": 5,
+      "end_line": 5,
+      "classification": "stale",
+      "reason": "expired 2026-08-01 (54 days ago; date from comment)",
+      "date": "2026-07-01",
+      "expires": "2026-08-01",
+      "age_days": 85,
+      "text": "2026-07-01: stale doc comment, expired on 2026-08-01.",
+      "fingerprint": "1368121ab4b387442dff60b588640b10397ca84f90888b2d6012ef727e23a578"
+    },
+    {
+      "path": "src/lib.rs",
+      "line": 8,
+      "end_line": 8,
+      "classification": "undated",
+      "reason": "no date at the start of the comment",
+      "text": "Undated doc comment with prose.",
+      "fingerprint": "29cc09abf180885b116c57fe3bb0b7522c23d8f7f784e27f6f23bfc83ec2cbb9"
+    },
+    {
+      "path": "src/lib.rs",
+      "line": 11,
+      "end_line": 11,
+      "classification": "malformed",
+      "reason": "\"2026-02-30\": day out of range for that month",
+      "text": "2026-02-30: malformed date.",
+      "fingerprint": "aedaf82b0ed3096eb5f4556121e00475ddab181130c890bcae031b54388e6059"
+    },
+    {
+      "path": "src/lib.rs",
+      "line": 14,
+      "end_line": 14,
+      "classification": "future",
+      "reason": "dated 68 days after the reference date",
+      "date": "2026-12-01",
+      "expires": "2027-01-01",
+      "age_days": -68,
+      "text": "2026-12-01: future-dated comment.",
+      "fingerprint": "3952d3b076a5933267df4389062023fc004f936fb5dce5d0f87f9cce7ddec264"
+    },
+    {
+      "path": "src/lib.rs",
+      "line": 17,
+      "end_line": 17,
+      "classification": "escape",
+      "reason": "mirrors a fixed wire format that does not change.",
+      "text": "no-rot: mirrors a fixed wire format that does not change.",
+      "fingerprint": "9620d58f2cb1d63be8551b12f10c36f7a69d34135c3cfba576640c76ddc97107"
+    },
+    {
+      "path": "src/lib.rs",
+      "line": 20,
+      "end_line": 20,
+      "classification": "malformed",
+      "reason": "`no-rot` escape without a reason; write `no-rot: <reason>`",
+      "text": "no-rot",
+      "fingerprint": "9373519f210ce4ecae847926541ba521e560a0725d2971fcb4e88aa42adcf385"
+    },
+    {
+      "path": "src/lib.rs",
+      "line": 23,
+      "end_line": 23,
+      "classification": "expiring",
+      "reason": "expires 2026-09-27 (in 3 days; date from comment)",
+      "date": "2026-08-27",
+      "expires": "2026-09-27",
+      "age_days": 28,
+      "text": "2026-08-27: expiring soon (expires 2026-09-27).",
+      "fingerprint": "f9ac19fce99a5e7da11e7849b20d411db9fd8dc1f0c32fe67a3900d81c15d6c7"
+    },
+    {
+      "path": "web/App.svelte",
+      "line": 3,
+      "end_line": 3,
+      "classification": "undated",
+      "reason": "no date at the start of the comment",
+      "text": "undated js comment",
+      "fingerprint": "967b7ef425606f63aa3dc2ab9142f69a06401e30605257fcb499564a38bc3f9b"
+    },
+    {
+      "path": "web/App.svelte",
+      "line": 9,
+      "end_line": 9,
+      "classification": "stale",
+      "reason": "expired 2026-02-01 (235 days ago; date from comment)",
+      "date": "2026-01-01",
+      "expires": "2026-02-01",
+      "age_days": 266,
+      "text": "2026-01-01: stale css comment",
+      "fingerprint": "526c6f4066d1243184f7780ec5750f8b3908fad2cb8a7aa382335bb45aa9894c"
+    }
+  ]
+}

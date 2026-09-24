@@ -1,0 +1,13 @@
+---
+source: tests/cli.rs
+expression: stdout
+---
+::error file=scripts/build.sh,line=2,endLine=2,title=comment-ttl%3A undated::no date at the start of the comment — undated shell comment
+::error file=src/lib.rs,line=5,endLine=5,title=comment-ttl%3A stale::expired 2026-08-01 (54 days ago; date from comment) — 2026-07-01: stale doc comment, expired on 2026-08-01.
+::error file=src/lib.rs,line=8,endLine=8,title=comment-ttl%3A undated::no date at the start of the comment — Undated doc comment with prose.
+::error file=src/lib.rs,line=11,endLine=11,title=comment-ttl%3A malformed::"2026-02-30": day out of range for that month — 2026-02-30: malformed date.
+::error file=src/lib.rs,line=14,endLine=14,title=comment-ttl%3A future::dated 68 days after the reference date — 2026-12-01: future-dated comment.
+::error file=src/lib.rs,line=20,endLine=20,title=comment-ttl%3A malformed::`no-rot` escape without a reason; write `no-rot: <reason>` — no-rot
+::error file=web/App.svelte,line=3,endLine=3,title=comment-ttl%3A undated::no date at the start of the comment — undated js comment
+::error file=web/App.svelte,line=9,endLine=9,title=comment-ttl%3A stale::expired 2026-02-01 (235 days ago; date from comment) — 2026-01-01: stale css comment
+::warning file=src/lib.rs,line=23,endLine=23,title=comment-ttl%3A expiring::expires 2026-09-27 (in 3 days; date from comment) — 2026-08-27: expiring soon (expires 2026-09-27).

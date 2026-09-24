@@ -1,0 +1,15 @@
+---
+source: tests/cli.rs
+expression: text
+---
+path,line,end_line,classification,date,expires,age_days,reason,text
+scripts/build.sh,2,2,undated,,,,no date at the start of the comment,undated shell comment
+src/lib.rs,5,5,stale,2026-07-01,2026-08-01,85,expired 2026-08-01 (54 days ago; date from comment),"2026-07-01: stale doc comment, expired on 2026-08-01."
+src/lib.rs,8,8,undated,,,,no date at the start of the comment,Undated doc comment with prose.
+src/lib.rs,11,11,malformed,,,,"""2026-02-30"": day out of range for that month",2026-02-30: malformed date.
+src/lib.rs,14,14,future,2026-12-01,2027-01-01,-68,dated 68 days after the reference date,2026-12-01: future-dated comment.
+src/lib.rs,17,17,escape,,,,mirrors a fixed wire format that does not change.,no-rot: mirrors a fixed wire format that does not change.
+src/lib.rs,20,20,malformed,,,,`no-rot` escape without a reason; write `no-rot: <reason>`,no-rot
+src/lib.rs,23,23,expiring,2026-08-27,2026-09-27,28,expires 2026-09-27 (in 3 days; date from comment),2026-08-27: expiring soon (expires 2026-09-27).
+web/App.svelte,3,3,undated,,,,no date at the start of the comment,undated js comment
+web/App.svelte,9,9,stale,2026-01-01,2026-02-01,266,expired 2026-02-01 (235 days ago; date from comment),2026-01-01: stale css comment

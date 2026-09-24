@@ -1,0 +1,4 @@
+# 2026-09-24: Fixtures and snapshots are byte-exact on every platform.
+* text=auto eol=lf
+tests/fixtures/** -text
+tests/snapshots/** -text

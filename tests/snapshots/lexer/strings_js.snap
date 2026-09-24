@@ -1,0 +1,76 @@
+---
+source: tests/lexer_golden.rs
+expression: comments
+---
+- line: 1
+  end_line: 1
+  kind: line
+  marker: //
+  own_line: true
+  indent: ""
+  raw: "// 2026-09-24: leading line comment"
+  text: "2026-09-24: leading line comment"
+- line: 2
+  end_line: 2
+  kind: line
+  marker: //
+  own_line: false
+  indent: ""
+  raw: // trailing after a string with //
+  text: trailing after a string with //
+- line: 9
+  end_line: 9
+  kind: line
+  marker: //
+  own_line: false
+  indent: ""
+  raw: // regex literal skipped
+  text: regex literal skipped
+- line: 10
+  end_line: 10
+  kind: line
+  marker: //
+  own_line: false
+  indent: ""
+  raw: // division is code
+  text: division is code
+- line: 11
+  end_line: 12
+  kind: block
+  marker: /*
+  own_line: true
+  indent: ""
+  raw: "/* block comment\nspanning lines */"
+  text: "block comment\nspanning lines"
+- line: 13
+  end_line: 16
+  kind: block
+  marker: /*
+  own_line: true
+  indent: ""
+  raw: "/**\n* @param {string} a\n* @returns {void}\n*/"
+  text: "@param {string} a\n@returns {void}"
+- line: 17
+  end_line: 17
+  kind: line
+  marker: //
+  own_line: false
+  indent: ""
+  raw: // regex after return
+  text: regex after return
+- line: 18
+  end_line: 19
+  kind: line
+  marker: //
+  own_line: true
+  indent: "  "
+  raw: "// indented group line 1\n// indented group line 2"
+  text: "indented group line 1\nindented group line 2"
+- line: 20
+  end_line: 20
+  kind: line
+  marker: //
+  own_line: true
+  indent: ""
+  raw: // different indent starts a new comment
+  text: different indent starts a new comment

@@ -1,0 +1,9 @@
+# 2026-09-24: zizmor configuration. `uses: ./` is deliberate: the e2e and
+# release workflows must exercise the action.yml of the checkout they just
+# built (with `binary_path`) or of the freshly re-pointed release tag.
+rules:
+  self-repository:
+    ignore:
+      - ci.yml
+      - e2e.yml
+      - release.yml

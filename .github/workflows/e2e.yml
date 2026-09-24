@@ -1,0 +1,131 @@
+# 2026-09-24: End-to-end: the composite action (`uses: ./`) runs a freshly
+# built binary against tests/fixtures/e2e on all three operating systems and
+# every output is compared with tests/fixtures/e2e/expected.json.
+name: e2e
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# 2026-09-24: One run per ref; superseded pull-request pushes are cancelled.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  e2e:
+    name: e2e (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-2025]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@02cb101ec7c40f2c49e1d9714d64511d8e1b74de # v1
+        with:
+          toolchain: stable
+      - run: cargo build --release --locked
+
+      - name: Read the expected results
+        id: expected
+        shell: bash
+        run: |
+          set -euo pipefail
+          bin=target/release/comment-ttl
+          if [ "$RUNNER_OS" = Windows ]; then bin="$bin.exe"; fi
+          {
+            echo "bin=$bin"
+            echo "exempt_paths=$(jq -r .exempt_paths tests/fixtures/e2e/expected.json)"
+            echo "reference_date=$(jq -r .reference_date tests/fixtures/e2e/expected.json)"
+            echo "comment_ttl=$(jq -r .comment_ttl tests/fixtures/e2e/expected.json)"
+            echo "warn_within=$(jq -r .warn_within tests/fixtures/e2e/expected.json)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Advisory run
+        id: advisory
+        uses: ./
+        with:
+          comment_ttl: ${{ steps.expected.outputs.comment_ttl }}
+          warn_within: ${{ steps.expected.outputs.warn_within }}
+          reference_date: ${{ steps.expected.outputs.reference_date }}
+          scan_dirs: ^tests/fixtures/e2e/
+          exempt_paths: ${{ steps.expected.outputs.exempt_paths }}
+          fail_on_flag: "false"
+          binary_path: ${{ steps.expected.outputs.bin }}
+          artifact_name: e2e-advisory-${{ matrix.os }}
+
+      - name: Every output matches expected.json
+        shell: bash
+        env:
+          ACTUAL: ${{ toJSON(steps.advisory.outputs) }}
+          REPORT_PATH: ${{ steps.advisory.outputs.report_path }}
+        run: |
+          set -euo pipefail
+          echo "$ACTUAL" | jq .
+          for key in $(jq -r '.counts | keys[]' tests/fixtures/e2e/expected.json); do
+            want=$(jq -r ".counts.$key" tests/fixtures/e2e/expected.json)
+            got=$(echo "$ACTUAL" | jq -r ".$key")
+            if [ "$want" != "$got" ]; then
+              echo "::error::output $key: expected $want, got $got"
+              exit 1
+            fi
+          done
+          test -s "$REPORT_PATH"
+          jq -e '.counts.flagged == 8 and (.findings | length) == 10' "$REPORT_PATH"
+
+      - name: Enforcing run (must fail)
+        id: enforcing
+        continue-on-error: true
+        uses: ./
+        with:
+          comment_ttl: ${{ steps.expected.outputs.comment_ttl }}
+          reference_date: ${{ steps.expected.outputs.reference_date }}
+          scan_dirs: ^tests/fixtures/e2e/
+          exempt_paths: ${{ steps.expected.outputs.exempt_paths }}
+          output_type: sarif
+          binary_path: ${{ steps.expected.outputs.bin }}
+          artifact_name: e2e-enforcing-${{ matrix.os }}
+
+      - name: The enforcing run failed with the right counts and a SARIF report
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.enforcing.outcome }}
+          FLAGGED: ${{ steps.enforcing.outputs.flagged }}
+          REPORT_PATH: ${{ steps.enforcing.outputs.report_path }}
+        run: |
+          set -euo pipefail
+          test "$OUTCOME" = failure
+          test "$FLAGGED" = 8
+          jq -e '.version == "2.1.0" and (.runs[0].results | length) == 9' "$REPORT_PATH"
+
+      - name: A fresh tree passes
+        id: clean
+        uses: ./
+        with:
+          comment_ttl: ${{ steps.expected.outputs.comment_ttl }}
+          reference_date: ${{ steps.expected.outputs.reference_date }}
+          scan_dirs: ^tests/fixtures/e2e/
+          exempt_paths: ${{ steps.expected.outputs.exempt_paths }}
+          baseline: tests/fixtures/e2e/baseline.json
+          binary_path: ${{ steps.expected.outputs.bin }}
+          artifact_name: e2e-baseline-${{ matrix.os }}
+
+      - name: The baseline grandfathered everything
+        shell: bash
+        env:
+          FLAGGED: ${{ steps.clean.outputs.flagged }}
+          EXEMPT: ${{ steps.clean.outputs.exempt }}
+        run: |
+          set -euo pipefail
+          test "$FLAGGED" = 0
+          test "$EXEMPT" = 12

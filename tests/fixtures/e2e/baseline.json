@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "path": "tests/fixtures/e2e/scripts/build.sh",
+      "fingerprint": "1b0be78196717903ad71f9ebbf4180f1092746854d185a86229f54d443b0729a",
+      "line": 2,
+      "excerpt": "undated shell comment"
+    },
+    {
+      "path": "tests/fixtures/e2e/src/lib.rs",
+      "fingerprint": "cd1b45683aab012651ddc67edf88d5616f1d82e9a050293d839a91c379f37c94",
+      "line": 5,
+      "excerpt": "2026-07-01: stale doc comment, expired on 2026-08-01."
+    },
+    {
+      "path": "tests/fixtures/e2e/src/lib.rs",
+      "fingerprint": "86b4722275509067d111801d2d613d9f70bc0c590b8eed7fc95834db6bd1010f",
+      "line": 8,
+      "excerpt": "Undated doc comment with prose."
+    },
+    {
+      "path": "tests/fixtures/e2e/src/lib.rs",
+      "fingerprint": "465b9cb8ac1e92ffdd9a879c086e3567b41fc0712e8bb9706197b3384ff1b058",
+      "line": 11,
+      "excerpt": "2026-02-30: malformed date."
+    },
+    {
+      "path": "tests/fixtures/e2e/src/lib.rs",
+      "fingerprint": "8fabb6febca89d3214bb6a6138579b1ebba22e5bbe1e24729e8e38ebe909486a",
+      "line": 14,
+      "excerpt": "2026-12-01: future-dated comment."
+    },
+    {
+      "path": "tests/fixtures/e2e/src/lib.rs",
+      "fingerprint": "22f73cdf802b071c145da7eb7836c935c061ae2bee12f4f48c6250e81b332538",
+      "line": 20,
+      "excerpt": "no-rot"
+    },
+    {
+      "path": "tests/fixtures/e2e/web/App.svelte",
+      "fingerprint": "7da52a7b2a6848c6f974bd984da5b604e1958ab67480d32baa867893fb72cbc9",
+      "line": 3,
+      "excerpt": "undated js comment"
+    },
+    {
+      "path": "tests/fixtures/e2e/web/App.svelte",
+      "fingerprint": "267d04981d52f5d5587765bba8137f27bd8ca616f8dce3b6d819a1bf96b1889f",
+      "line": 9,
+      "excerpt": "2026-01-01: stale css comment"
+    }
+  ]
+}

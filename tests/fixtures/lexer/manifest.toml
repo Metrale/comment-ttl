@@ -1,0 +1,7 @@
+# 2026-09-24: dated header
+[package]
+name = "x" # trailing
+description = """
+# DECOY in a multi-line basic string
+"""
+literal = '''# DECOY'''

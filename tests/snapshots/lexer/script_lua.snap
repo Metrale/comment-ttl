@@ -1,0 +1,28 @@
+---
+source: tests/lexer_golden.rs
+expression: comments
+---
+- line: 1
+  end_line: 1
+  kind: line
+  marker: "--"
+  own_line: true
+  indent: ""
+  raw: "-- 2026-09-24: dated"
+  text: "2026-09-24: dated"
+- line: 2
+  end_line: 2
+  kind: line
+  marker: "--"
+  own_line: false
+  indent: ""
+  raw: "-- trailing"
+  text: trailing
+- line: 3
+  end_line: 4
+  kind: block
+  marker: "--[["
+  own_line: true
+  indent: ""
+  raw: "--[[ block\ncomment ]]"
+  text: "block\ncomment"

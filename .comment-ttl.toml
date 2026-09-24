@@ -1,0 +1,6 @@
+# 2026-09-24: This repository runs comment-ttl on its own comments (ci.yml,
+# job "self-check"). Fixtures intentionally contain undated comments.
+comment_ttl = "6 months"
+warn_within = "14d"
+reference_date = "commit"
+exempt_paths = "^tests/fixtures/"

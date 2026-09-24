@@ -1,0 +1,60 @@
+---
+source: tests/lexer_golden.rs
+expression: comments
+---
+- line: 1
+  end_line: 1
+  kind: line
+  marker: "#"
+  own_line: true
+  indent: ""
+  raw: "# 2026-09-24: top comment"
+  text: "2026-09-24: top comment"
+- line: 2
+  end_line: 2
+  kind: line
+  marker: "#"
+  own_line: false
+  indent: ""
+  raw: "# trailing comment"
+  text: trailing comment
+- line: 3
+  end_line: 3
+  kind: line
+  marker: "#"
+  own_line: false
+  indent: ""
+  raw: "# after doubled quote"
+  text: after doubled quote
+- line: 4
+  end_line: 4
+  kind: line
+  marker: "#"
+  own_line: false
+  indent: ""
+  raw: "# yes"
+  text: "yes"
+- line: 6
+  end_line: 6
+  kind: line
+  marker: "#"
+  own_line: false
+  indent: ""
+  raw: "# v4"
+  text: v4
+- line: 7
+  end_line: 7
+  kind: line
+  marker: "#"
+  own_line: false
+  indent: ""
+  raw: "# positional count"
+  text: positional count
+- line: 8
+  end_line: 8
+  kind: line
+  marker: "#"
+  own_line: true
+  indent: "  "
+  raw: "# own-line inside a list"
+  text: own-line inside a list

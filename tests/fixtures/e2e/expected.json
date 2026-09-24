@@ -1,0 +1,20 @@
+{
+  "reference_date": "2026-09-24",
+  "comment_ttl": "1 month",
+  "warn_within": "7d",
+  "exempt_paths": "(^|/)generated/",
+  "counts": {
+    "files_scanned": 3,
+    "files_skipped_binary": 1,
+    "comments": 17,
+    "flagged": 8,
+    "stale": 2,
+    "undated": 3,
+    "malformed": 2,
+    "future": 1,
+    "exempt": 4,
+    "escape": 1,
+    "expiring": 1,
+    "fresh": 3
+  }
+}

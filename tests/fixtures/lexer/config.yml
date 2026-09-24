@@ -1,0 +1,9 @@
+# 2026-09-24: top comment
+url: http://example.com/#DECOY # trailing comment
+name: 'it''s # DECOY' # after doubled quote
+description: "hash # DECOY" # yes
+steps:
+  - uses: actions/checkout@abc123 # v4
+  - run: echo "$#" # positional count
+  # own-line inside a list
+  - name: x

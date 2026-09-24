@@ -1,0 +1,39 @@
+---
+source: tests/cli.rs
+expression: "fs::read_to_string(&summary).unwrap()"
+---
+## comment-ttl
+
+**8 flagged comment(s)** — this check failed.
+
+Reference date **2026-09-24** (fixed), TTL `1 month` (`P1M`), warn within `7d`, scope `all`.
+
+| classification | count |
+|---|---:|
+| flagged | 8 |
+| stale | 2 |
+| undated | 3 |
+| malformed | 2 |
+| future | 1 |
+| expiring | 1 |
+| escape | 1 |
+| exempt | 4 |
+| fresh | 3 |
+| comments | 17 |
+| files scanned | 3 |
+| binary files skipped | 1 |
+
+### Findings (10)
+
+| location | classification | date | expires | note | comment |
+|---|---|---|---|---|---|
+| `scripts/build.sh:2` | undated |  |  | no date at the start of the comment | undated shell comment |
+| `src/lib.rs:5` | stale | 2026-07-01 | 2026-08-01 | expired 2026-08-01 (54 days ago; date from comment) | 2026-07-01: stale doc comment, expired on 2026-08-01. |
+| `src/lib.rs:8` | undated |  |  | no date at the start of the comment | Undated doc comment with prose. |
+| `src/lib.rs:11` | malformed |  |  | "2026-02-30": day out of range for that month | 2026-02-30: malformed date. |
+| `src/lib.rs:14` | future | 2026-12-01 | 2027-01-01 | dated 68 days after the reference date | 2026-12-01: future-dated comment. |
+| `src/lib.rs:17` | escape |  |  | mirrors a fixed wire format that does not change. | no-rot: mirrors a fixed wire format that does not change. |
+| `src/lib.rs:20` | malformed |  |  | `no-rot` escape without a reason; write `no-rot: <reason>` | no-rot |
+| `src/lib.rs:23` | expiring | 2026-08-27 | 2026-09-27 | expires 2026-09-27 (in 3 days; date from comment) | 2026-08-27: expiring soon (expires 2026-09-27). |
+| `web/App.svelte:3` | undated |  |  | no date at the start of the comment | undated js comment |
+| `web/App.svelte:9` | stale | 2026-01-01 | 2026-02-01 | expired 2026-02-01 (235 days ago; date from comment) | 2026-01-01: stale css comment |

@@ -1,0 +1,204 @@
+# 2026-09-24: Composite action wrapping the prebuilt comment-ttl binary.
+# The version and checksums below are written by the release workflow; on a
+# non-release ref they are placeholders and the action refuses to run unless
+# `binary_path` is given.
+name: comment-ttl
+description: Fail CI when a code comment has not been re-verified within its time-to-live
+author: Metrale
+branding:
+  icon: clock
+  color: purple
+
+inputs:
+  comment_ttl:
+    description: "Time-to-live after which a dated comment must be re-verified, e.g. `1 month`, `30d`, `2w`, `1y 2mo`, `P1M`"
+    required: true
+  scan_dirs:
+    description: "Regex over directories to scan, matched against `dir/` (root files see `./`)"
+    required: false
+    default: "."
+  file_types:
+    description: "Regex over file names to include (all files with a known comment syntax when empty)"
+    required: false
+    default: ""
+  exempt_paths:
+    description: "Regex over paths to skip entirely (generated, vendored, build output)"
+    required: false
+    default: ""
+  comment_formats:
+    description: "YAML/JSON mapping of file-name regex to a comment syntax (a preset name or `{line, block, strings}`), merged over the defaults"
+    required: false
+    default: ""
+  exemptions:
+    description: "YAML/JSON list of regexes extending the default exemptions, or `{replace: true, patterns: [...]}` to replace them"
+    required: false
+    default: ""
+  output_type:
+    description: "Report format: json | csv | sarif | markdown"
+    required: false
+    default: json
+  fail_on_flag:
+    description: "Fail the step when any comment is stale, undated, malformed or future-dated"
+    required: false
+    default: "true"
+  reference_date:
+    description: "now | commit | YYYY-MM-DD; `commit` uses the head commit's committer date so re-runs agree"
+    required: false
+    default: commit
+  warn_within:
+    description: "Report comments whose TTL ends within this duration without failing, e.g. `7d`"
+    required: false
+    default: ""
+  baseline:
+    description: "Path to a baseline file of grandfathered comments (write one with `comment-ttl baseline`)"
+    required: false
+    default: ""
+  scope:
+    description: "all | changed; `changed` only judges comments inside the pull request's hunks"
+    required: false
+    default: all
+  undated:
+    description: "fail | blame; `blame` dates undated comments from git history instead of flagging them"
+    required: false
+    default: fail
+  annotations:
+    description: "Emit GitHub annotations (the runner shows at most 10 per step; the job summary has the full list)"
+    required: false
+    default: "true"
+  artifact_name:
+    description: "Name of the uploaded report artifact"
+    required: false
+    default: comment-ttl-report
+  binary_path:
+    description: "Path to a locally built comment-ttl binary; skips the download and checksum (for developing this action or air-gapped runners)"
+    required: false
+    default: ""
+
+outputs:
+  flagged:
+    description: Number of comments that failed (stale + undated + malformed + future)
+    value: ${{ steps.check.outputs.flagged }}
+  stale:
+    description: Number of comments past their TTL
+    value: ${{ steps.check.outputs.stale }}
+  undated:
+    description: Number of comments with no leading date
+    value: ${{ steps.check.outputs.undated }}
+  malformed:
+    description: Number of comments with an invalid date or a `no-rot` escape without a reason
+    value: ${{ steps.check.outputs.malformed }}
+  future:
+    description: Number of comments dated more than one day ahead
+    value: ${{ steps.check.outputs.future }}
+  exempt:
+    description: Number of comments matched by an exemption or the baseline
+    value: ${{ steps.check.outputs.exempt }}
+  escape:
+    description: Number of comments carrying a `no-rot:` reason
+    value: ${{ steps.check.outputs.escape }}
+  expiring:
+    description: Number of comments whose TTL ends within `warn_within`
+    value: ${{ steps.check.outputs.expiring }}
+  fresh:
+    description: Number of comments within their TTL
+    value: ${{ steps.check.outputs.fresh }}
+  comments:
+    description: Total number of comments scanned
+    value: ${{ steps.check.outputs.comments }}
+  files_scanned:
+    description: Number of files scanned
+    value: ${{ steps.check.outputs.files_scanned }}
+  report_path:
+    description: Path of the written report
+    value: ${{ steps.check.outputs.report_path }}
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve the comment-ttl binary
+      id: bin
+      shell: bash
+      env:
+        INPUT_BINARY_PATH: ${{ inputs.binary_path }}
+        RUNNER_OS_NAME: ${{ runner.os }}
+        RUNNER_ARCH_NAME: ${{ runner.arch }}
+        COMMENT_TTL_VERSION: "0.0.0-dev"
+        SHA256_LINUX_X64: "PLACEHOLDER"
+        SHA256_LINUX_ARM64: "PLACEHOLDER"
+        SHA256_MACOS_ARM64: "PLACEHOLDER"
+        SHA256_MACOS_X64: "PLACEHOLDER"
+        SHA256_WINDOWS_X64: "PLACEHOLDER"
+      run: |
+        set -euo pipefail
+        if [ -n "$INPUT_BINARY_PATH" ]; then
+          echo "path=$INPUT_BINARY_PATH" >> "$GITHUB_OUTPUT"
+          echo "Using binary_path=$INPUT_BINARY_PATH (download and checksum skipped)"
+          exit 0
+        fi
+        case "$RUNNER_OS_NAME/$RUNNER_ARCH_NAME" in
+          Linux/X64)     asset=comment-ttl-x86_64-unknown-linux-musl; sum="$SHA256_LINUX_X64" ;;
+          Linux/ARM64)   asset=comment-ttl-aarch64-unknown-linux-musl; sum="$SHA256_LINUX_ARM64" ;;
+          macOS/ARM64)   asset=comment-ttl-aarch64-apple-darwin; sum="$SHA256_MACOS_ARM64" ;;
+          macOS/X64)     asset=comment-ttl-x86_64-apple-darwin; sum="$SHA256_MACOS_X64" ;;
+          Windows/X64)   asset=comment-ttl-x86_64-pc-windows-msvc.exe; sum="$SHA256_WINDOWS_X64" ;;
+          *)
+            echo "::error title=comment-ttl::no prebuilt comment-ttl binary for $RUNNER_OS_NAME/$RUNNER_ARCH_NAME (available: Linux x64/arm64, macOS arm64/x64, Windows x64). Build it with cargo and pass binary_path."
+            exit 2 ;;
+        esac
+        if [ "$sum" = "PLACEHOLDER" ]; then
+          echo "::error title=comment-ttl::this ref of Metrale/comment-ttl is not a release; use a released tag or its commit SHA (see the README), or pass binary_path."
+          exit 2
+        fi
+        dest="$RUNNER_TEMP/comment-ttl-bin"
+        mkdir -p "$dest"
+        bin="$dest/$asset"
+        url="https://github.com/Metrale/comment-ttl/releases/download/v${COMMENT_TTL_VERSION}/$asset"
+        echo "Downloading $url"
+        curl --fail --silent --show-error --location --retry 3 --output "$bin" "$url"
+        if command -v sha256sum >/dev/null 2>&1; then
+          actual=$(sha256sum "$bin" | cut -d ' ' -f 1)
+        else
+          actual=$(shasum -a 256 "$bin" | cut -d ' ' -f 1)
+        fi
+        if [ "$actual" != "$sum" ]; then
+          echo "::error title=comment-ttl::checksum mismatch for $asset: expected $sum, got $actual"
+          exit 2
+        fi
+        chmod +x "$bin"
+        echo "path=$bin" >> "$GITHUB_OUTPUT"
+
+    - name: Check comment TTLs
+      id: check
+      shell: bash
+      env:
+        INPUT_COMMENT_TTL: ${{ inputs.comment_ttl }}
+        INPUT_SCAN_DIRS: ${{ inputs.scan_dirs }}
+        INPUT_FILE_TYPES: ${{ inputs.file_types }}
+        INPUT_EXEMPT_PATHS: ${{ inputs.exempt_paths }}
+        INPUT_COMMENT_FORMATS: ${{ inputs.comment_formats }}
+        INPUT_EXEMPTIONS: ${{ inputs.exemptions }}
+        INPUT_OUTPUT_TYPE: ${{ inputs.output_type }}
+        INPUT_FAIL_ON_FLAG: ${{ inputs.fail_on_flag }}
+        INPUT_REFERENCE_DATE: ${{ inputs.reference_date }}
+        INPUT_WARN_WITHIN: ${{ inputs.warn_within }}
+        INPUT_BASELINE: ${{ inputs.baseline }}
+        INPUT_SCOPE: ${{ inputs.scope }}
+        INPUT_UNDATED: ${{ inputs.undated }}
+        INPUT_ANNOTATIONS: ${{ inputs.annotations }}
+        INPUT_DIFF_BASE: ${{ github.event.pull_request.base.sha }}
+        COMMENT_TTL_BIN: ${{ steps.bin.outputs.path }}
+      run: |
+        set -uo pipefail
+        case "$INPUT_OUTPUT_TYPE" in
+          csv) ext=csv ;; sarif) ext=sarif ;; markdown) ext=md ;; *) ext=json ;;
+        esac
+        report="$RUNNER_TEMP/comment-ttl-report/comment-ttl-report.$ext"
+        "$COMMENT_TTL_BIN" check --out "$report"
+
+    - name: Upload the report
+      if: ${{ always() && steps.bin.outputs.path != '' }}
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: ${{ inputs.artifact_name }}
+        path: ${{ runner.temp }}/comment-ttl-report/
+        if-no-files-found: ignore

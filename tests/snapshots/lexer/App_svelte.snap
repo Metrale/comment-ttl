@@ -1,0 +1,52 @@
+---
+source: tests/lexer_golden.rs
+expression: comments
+---
+- line: 1
+  end_line: 1
+  kind: block
+  marker: "<!--"
+  own_line: true
+  indent: ""
+  raw: "<!-- 2026-09-24: html comment kind -->"
+  text: "2026-09-24: html comment kind"
+- line: 3
+  end_line: 3
+  kind: line
+  marker: //
+  own_line: true
+  indent: "  "
+  raw: "// 2026-09-24: js line comment kind"
+  text: "2026-09-24: js line comment kind"
+- line: 4
+  end_line: 4
+  kind: block
+  marker: /*
+  own_line: true
+  indent: "  "
+  raw: /* js block comment kind */
+  text: js block comment kind
+- line: 5
+  end_line: 5
+  kind: line
+  marker: //
+  own_line: false
+  indent: ""
+  raw: // trailing
+  text: trailing
+- line: 9
+  end_line: 9
+  kind: block
+  marker: "<!--"
+  own_line: true
+  indent: ""
+  raw: "<!-- svelte-ignore a11y-no-static-element-interactions -->"
+  text: svelte-ignore a11y-no-static-element-interactions
+- line: 13
+  end_line: 13
+  kind: block
+  marker: /*
+  own_line: true
+  indent: "  "
+  raw: "/* 2026-09-24: css comment kind */"
+  text: "2026-09-24: css comment kind"

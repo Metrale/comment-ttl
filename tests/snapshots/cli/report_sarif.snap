@@ -1,0 +1,328 @@
+---
+source: tests/cli.rs
+expression: text
+---
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/main/sarif-2.1/schema/sarif-schema-2.1.0.json",
+  "version": "[version]",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "comment-ttl",
+          "version": "[version]",
+          "informationUri": "https://github.com/Metrale/comment-ttl",
+          "rules": [
+            {
+              "id": "stale",
+              "name": "Stale comment",
+              "shortDescription": {
+                "text": "The comment's verification date is older than the configured TTL."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "undated",
+              "name": "Undated comment",
+              "shortDescription": {
+                "text": "The comment does not start with a YYYY-MM-DD verification date."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "malformed",
+              "name": "Malformed date or escape",
+              "shortDescription": {
+                "text": "The comment starts with an invalid date, or uses `no-rot` without a reason."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "future",
+              "name": "Future-dated comment",
+              "shortDescription": {
+                "text": "The comment is dated more than one day after the reference date."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "expiring",
+              "name": "Expiring comment",
+              "shortDescription": {
+                "text": "The comment will pass its TTL within the warn_within window."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "escape",
+              "name": "Escaped comment",
+              "shortDescription": {
+                "text": "The comment opted out of dating with a `no-rot:` reason."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              }
+            }
+          ]
+        }
+      },
+      "originalUriBaseIds": {
+        "%SRCROOT%": {
+          "uri": "file:///"
+        }
+      },
+      "results": [
+        {
+          "ruleId": "undated",
+          "level": "error",
+          "message": {
+            "text": "undated: no date at the start of the comment"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "scripts/build.sh",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 2
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "commentTextHash/v1": "3d94d75f5cb0493c8ee92d1326f124336cd3cfd96337466955ee205f6758c90b"
+          }
+        },
+        {
+          "ruleId": "stale",
+          "level": "error",
+          "message": {
+            "text": "stale: expired 2026-08-01 (54 days ago; date from comment)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/lib.rs",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 5,
+                  "endLine": 5
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "commentTextHash/v1": "1368121ab4b387442dff60b588640b10397ca84f90888b2d6012ef727e23a578"
+          }
+        },
+        {
+          "ruleId": "undated",
+          "level": "error",
+          "message": {
+            "text": "undated: no date at the start of the comment"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/lib.rs",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 8,
+                  "endLine": 8
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "commentTextHash/v1": "29cc09abf180885b116c57fe3bb0b7522c23d8f7f784e27f6f23bfc83ec2cbb9"
+          }
+        },
+        {
+          "ruleId": "malformed",
+          "level": "error",
+          "message": {
+            "text": "malformed: \"2026-02-30\": day out of range for that month"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/lib.rs",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 11,
+                  "endLine": 11
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "commentTextHash/v1": "aedaf82b0ed3096eb5f4556121e00475ddab181130c890bcae031b54388e6059"
+          }
+        },
+        {
+          "ruleId": "future",
+          "level": "error",
+          "message": {
+            "text": "future: dated 68 days after the reference date"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/lib.rs",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 14,
+                  "endLine": 14
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "commentTextHash/v1": "3952d3b076a5933267df4389062023fc004f936fb5dce5d0f87f9cce7ddec264"
+          }
+        },
+        {
+          "ruleId": "escape",
+          "level": "note",
+          "message": {
+            "text": "escape: mirrors a fixed wire format that does not change."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/lib.rs",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 17,
+                  "endLine": 17
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "commentTextHash/v1": "9620d58f2cb1d63be8551b12f10c36f7a69d34135c3cfba576640c76ddc97107"
+          }
+        },
+        {
+          "ruleId": "malformed",
+          "level": "error",
+          "message": {
+            "text": "malformed: `no-rot` escape without a reason; write `no-rot: <reason>`"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/lib.rs",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 20,
+                  "endLine": 20
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "commentTextHash/v1": "9373519f210ce4ecae847926541ba521e560a0725d2971fcb4e88aa42adcf385"
+          }
+        },
+        {
+          "ruleId": "expiring",
+          "level": "warning",
+          "message": {
+            "text": "expiring: expires 2026-09-27 (in 3 days; date from comment)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/lib.rs",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 23,
+                  "endLine": 23
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "commentTextHash/v1": "f9ac19fce99a5e7da11e7849b20d411db9fd8dc1f0c32fe67a3900d81c15d6c7"
+          }
+        },
+        {
+          "ruleId": "undated",
+          "level": "error",
+          "message": {
+            "text": "undated: no date at the start of the comment"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "web/App.svelte",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 3,
+                  "endLine": 3
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "commentTextHash/v1": "967b7ef425606f63aa3dc2ab9142f69a06401e30605257fcb499564a38bc3f9b"
+          }
+        },
+        {
+          "ruleId": "stale",
+          "level": "error",
+          "message": {
+            "text": "stale: expired 2026-02-01 (235 days ago; date from comment)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "web/App.svelte",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 9,
+                  "endLine": 9
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "commentTextHash/v1": "526c6f4066d1243184f7780ec5750f8b3908fad2cb8a7aa382335bb45aa9894c"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+---
+source: tests/lexer_golden.rs
+expression: comments
+---
+- line: 1
+  end_line: 1
+  kind: line
+  marker: "#"
+  own_line: true
+  indent: ""
+  raw: "# 2026-09-24: dated header"
+  text: "2026-09-24: dated header"
+- line: 3
+  end_line: 3
+  kind: line
+  marker: "#"
+  own_line: false
+  indent: ""
+  raw: "# trailing"
+  text: trailing

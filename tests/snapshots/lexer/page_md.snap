@@ -1,0 +1,20 @@
+---
+source: tests/lexer_golden.rs
+expression: comments
+---
+- line: 3
+  end_line: 3
+  kind: block
+  marker: "<!--"
+  own_line: true
+  indent: ""
+  raw: "<!-- 2026-09-24: markdown html comment -->"
+  text: "2026-09-24: markdown html comment"
+- line: 5
+  end_line: 5
+  kind: block
+  marker: "<!--"
+  own_line: true
+  indent: ""
+  raw: "<!-- markdownlint-disable MD033 -->"
+  text: markdownlint-disable MD033

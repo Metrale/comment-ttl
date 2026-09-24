@@ -143,11 +143,20 @@ impl ScanArgs {
     }
 }
 
+/// 2026-09-24: Values that were piped through a file on Windows can carry a
+/// trailing CR or LF; neither is ever a meaningful part of a regex, a path or
+/// a duration, so they are dropped at the boundary.
+fn strip_line_ending(value: String) -> String {
+    value.trim_end_matches(['\r', '\n']).to_string()
+}
+
 /// 2026-09-24: The `INPUT_*` layer. Empty values count as unset, which is
 /// how a composite action passes an input the caller left out.
 pub fn layer_from_env(get: &dyn Fn(&str) -> Option<String>) -> Layer {
     let s = |name: &str| {
-        get(&format!("INPUT_{}", name.to_ascii_uppercase())).filter(|v| !v.trim().is_empty())
+        get(&format!("INPUT_{}", name.to_ascii_uppercase()))
+            .map(strip_line_ending)
+            .filter(|v| !v.trim().is_empty())
     };
     let v = |name: &str| s(name).map(Value::String);
     Layer {
@@ -209,12 +218,18 @@ mod tests {
     fn env_layer_ignores_empty_values_and_flags_win() {
         let env = |k: &str| match k {
             "INPUT_COMMENT_TTL" => Some("30d".to_string()),
+            "INPUT_EXEMPT_PATHS" => Some("(^|/)generated/\r\n".to_string()),
             "INPUT_SCOPE" => Some("".to_string()),
             "INPUT_FAIL_ON_FLAG" => Some("false".to_string()),
             _ => None,
         };
         let layer = layer_from_env(&env);
         assert_eq!(layer.comment_ttl.as_deref(), Some("30d"));
+        assert_eq!(
+            layer.exempt_paths.as_deref(),
+            Some("(^|/)generated/"),
+            "a CRLF from a Windows pipe must not end up inside the regex"
+        );
         assert_eq!(layer.scope, None);
         assert_eq!(layer.fail_on_flag, Some(Value::String("false".into())));
 

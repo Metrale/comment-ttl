@@ -52,6 +52,7 @@ jobs:
             echo "comment_ttl=$(field .comment_ttl)"
             echo "warn_within=$(field .warn_within)"
           } >> "$GITHUB_OUTPUT"
+          printf '%s' "$(field .exempt_paths)" | od -c
 
       - name: Advisory run
         id: advisory

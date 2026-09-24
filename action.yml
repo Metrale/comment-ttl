@@ -125,6 +125,9 @@ runs:
         INPUT_BINARY_PATH: ${{ inputs.binary_path }}
         RUNNER_OS_NAME: ${{ runner.os }}
         RUNNER_ARCH_NAME: ${{ runner.arch }}
+        # 2026-09-24: Git-bash on Windows rewrites values that look like POSIX paths
+        # before a native program sees them (`(^|/)x` became `(^|C:/Program Files/Git/)x`).
+        MSYS_NO_PATHCONV: "1"
         COMMENT_TTL_VERSION: "0.0.0-dev"
         SHA256_LINUX_X64: "PLACEHOLDER"
         SHA256_LINUX_ARM64: "PLACEHOLDER"
@@ -190,6 +193,8 @@ runs:
         INPUT_ANNOTATIONS: ${{ inputs.annotations }}
         INPUT_DIFF_BASE: ${{ github.event.pull_request.base.sha }}
         COMMENT_TTL_BIN: ${{ steps.bin.outputs.path }}
+        # 2026-09-24: Regex inputs must reach the binary byte for byte; see the step above.
+        MSYS_NO_PATHCONV: "1"
       run: |
         set -uo pipefail
         case "$INPUT_OUTPUT_TYPE" in

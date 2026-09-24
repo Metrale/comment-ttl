@@ -52,26 +52,6 @@ jobs:
             echo "comment_ttl=$(field .comment_ttl)"
             echo "warn_within=$(field .warn_within)"
           } >> "$GITHUB_OUTPUT"
-          printf '%s' "$(field .exempt_paths)" | od -c
-
-      - name: Windows diagnostics (temporary)
-        if: runner.os == 'Windows'
-        shell: bash
-        env:
-          INPUT_EXEMPT_PATHS: (^|/)generated/
-          INPUT_SCAN_DIRS: ^tests/fixtures/e2e/
-          INPUT_COMMENT_TTL: 1 month
-          INPUT_REFERENCE_DATE: "2026-09-24"
-          INPUT_ANNOTATIONS: "false"
-          INPUT_FAIL_ON_FLAG: "false"
-        run: |
-          set -uo pipefail
-          powershell -Command 'Write-Output ("native sees: [" + $env:INPUT_EXEMPT_PATHS + "] scan=[" + $env:INPUT_SCAN_DIRS + "]")'
-          echo "== via env"; target/release/comment-ttl.exe check --out r1.json; jq -c .counts r1.json
-          echo "== via flag"; target/release/comment-ttl.exe check --exempt-paths '(^|/)generated/' --out r2.json; jq -c .counts r2.json
-          echo "== via env, MSYS_NO_PATHCONV"; MSYS_NO_PATHCONV=1 target/release/comment-ttl.exe check --out r3.json; jq -c .counts r3.json
-          echo "== via env, plain regex"; INPUT_EXEMPT_PATHS='generated/' target/release/comment-ttl.exe check --out r4.json; jq -c .counts r4.json
-          echo "== ls-files"; git ls-files -z tests/fixtures/e2e | od -c | head -8
 
       - name: Advisory run
         id: advisory

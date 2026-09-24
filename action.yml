@@ -108,6 +108,9 @@ outputs:
   files_scanned:
     description: Number of files scanned
     value: ${{ steps.check.outputs.files_scanned }}
+  files_skipped_binary:
+    description: Number of files skipped as binary
+    value: ${{ steps.check.outputs.files_skipped_binary }}
   report_path:
     description: Path of the written report
     value: ${{ steps.check.outputs.report_path }}

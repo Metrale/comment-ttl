@@ -74,6 +74,10 @@ pub fn outputs(report: &Report, report_path: &str) -> Vec<(String, String)> {
         ("fresh".into(), c.fresh.to_string()),
         ("comments".into(), c.comments.to_string()),
         ("files_scanned".into(), c.files_scanned.to_string()),
+        (
+            "files_skipped_binary".into(),
+            c.files_skipped_binary.to_string(),
+        ),
         ("report_path".into(), report_path.to_string()),
     ]
 }

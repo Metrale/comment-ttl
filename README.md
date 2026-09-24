@@ -117,6 +117,7 @@ exemptions = ["^// -{3,}$"]
 | `fresh` | comments within their TTL |
 | `comments` | total comments scanned |
 | `files_scanned` | files scanned |
+| `files_skipped_binary` | files skipped as binary |
 | `report_path` | path of the written report |
 
 The report (JSON by default) lists every finding with its path, line range,

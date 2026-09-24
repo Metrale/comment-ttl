@@ -43,12 +43,14 @@ jobs:
           set -euo pipefail
           bin=target/release/comment-ttl
           if [ "$RUNNER_OS" = Windows ]; then bin="$bin.exe"; fi
+          # 2026-09-24: jq.exe on Windows prints CRLF; a trailing CR would end up inside the regex.
+          field() { jq -r "$1" tests/fixtures/e2e/expected.json | tr -d '\r'; }
           {
             echo "bin=$bin"
-            echo "exempt_paths=$(jq -r .exempt_paths tests/fixtures/e2e/expected.json)"
-            echo "reference_date=$(jq -r .reference_date tests/fixtures/e2e/expected.json)"
-            echo "comment_ttl=$(jq -r .comment_ttl tests/fixtures/e2e/expected.json)"
-            echo "warn_within=$(jq -r .warn_within tests/fixtures/e2e/expected.json)"
+            echo "exempt_paths=$(field .exempt_paths)"
+            echo "reference_date=$(field .reference_date)"
+            echo "comment_ttl=$(field .comment_ttl)"
+            echo "warn_within=$(field .warn_within)"
           } >> "$GITHUB_OUTPUT"
 
       - name: Advisory run
@@ -72,9 +74,9 @@ jobs:
         run: |
           set -euo pipefail
           echo "$ACTUAL" | jq .
-          for key in $(jq -r '.counts | keys[]' tests/fixtures/e2e/expected.json); do
-            want=$(jq -r ".counts.$key" tests/fixtures/e2e/expected.json)
-            got=$(echo "$ACTUAL" | jq -r ".$key")
+          for key in $(jq -r '.counts | keys[]' tests/fixtures/e2e/expected.json | tr -d '\r'); do
+            want=$(jq -r ".counts.$key" tests/fixtures/e2e/expected.json | tr -d '\r')
+            got=$(echo "$ACTUAL" | jq -r ".$key" | tr -d '\r')
             if [ "$want" != "$got" ]; then
               echo "::error::output $key: expected $want, got $got"
               exit 1

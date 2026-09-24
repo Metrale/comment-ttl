@@ -127,7 +127,7 @@ jobs:
           text = open("action.yml").read()
           def put(key, value):
               global text
-              pattern = rf'^(\s*{key}: )"[^"]*"$'
+              pattern = rf'^(\s*{key}: )"PLACEHOLDER"$' if key.startswith("SHA256_") else rf'^(\s*{key}: )"[^"]*"$'
               text, n = re.subn(pattern, rf'\g<1>"{value}"', text, flags=re.M)
               assert n == 1, f"{key}: {n} matches"
           put("COMMENT_TTL_VERSION", version)
@@ -136,7 +136,9 @@ jobs:
           put("SHA256_MACOS_ARM64", macos_arm64)
           put("SHA256_MACOS_X64", macos_x64)
           put("SHA256_WINDOWS_X64", windows_x64)
-          assert "PLACEHOLDER" not in text
+          for value in (linux_x64, linux_arm64, macos_arm64, macos_x64, windows_x64):
+              assert re.fullmatch(r"[0-9a-f]{64}", value), f"bad checksum {value!r}"
+          assert not re.search(r'^\s*SHA256_\w+: "PLACEHOLDER"$', text, flags=re.M), "a checksum is still a placeholder"
           open("action.yml", "w").write(text)
           PY
           git config user.name "github-actions[bot]"

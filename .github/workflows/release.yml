@@ -211,14 +211,19 @@ jobs:
     permissions:
       contents: write # 2026-09-24: moves the floating major-version tag
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: true
+      # 2026-09-24: No checkout: actions/checkout refuses a tag that no longer
+      # points at the triggering commit, and re-pointing it is exactly what
+      # `publish` does. The ref is created or force-updated through the API.
       - env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
           SHA: ${{ needs.publish.outputs.sha }}
           TAG: ${{ github.ref_name }}
         run: |
           set -euo pipefail
           major="${TAG%%.*}"
-          git push --force origin "$SHA:refs/tags/$major"
-          echo "$major -> $SHA"
+          if gh api "repos/$REPO/git/ref/tags/$major" >/dev/null 2>&1; then
+            gh api -X PATCH "repos/$REPO/git/refs/tags/$major" -f sha="$SHA" -F force=true --jq '.ref + " -> " + .object.sha'
+          else
+            gh api -X POST "repos/$REPO/git/refs" -f ref="refs/tags/$major" -f sha="$SHA" --jq '.ref + " -> " + .object.sha'
+          fi

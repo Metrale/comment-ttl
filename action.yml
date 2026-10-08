@@ -7,7 +7,7 @@ description: Fail CI when a code comment has not been re-verified within its tim
 author: Metrale
 branding:
   icon: clock
-  color: purple
+  color: orange
 
 inputs:
   comment_ttl:
